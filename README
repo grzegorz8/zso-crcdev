@@ -1,0 +1,42 @@
+Rozwiązanie zadania drugiego
+
+Grzegorz Kołakowski, gk291583
+
+I Pliki
+    - crcdev.c - implementacja sterownik
+    - crcdev_structs.h - definicje pomocniczych struktur
+    - crcdev.h
+    - crcdev_ioctl.h
+    - Makefile
+    - Kbuild
+    - README
+
+II Implementacja
+
+Sterownik używa bloku wczytywania danych i wykorzystuje wszystkie konteksty
+sprzętowe.
+Sterownik NIE używa bloku wczytywania poleceń.
+
+Działanie sterownika:
+W momencie otwarcia pliku tworzony jest kontekst.
+W momencie wywołania write, czekamy na wolny kontekst urządzenia. Gdy
+dostaniemy kontekst, ustawiamy odpowiednio rejestry kontekstu, potem kopiujemy
+dane (możliwe że tylko część, gdy bufor jest za mały) do bufora DMA. Następnie
+czekamy, aż blok wczytywania danych będzie wolny i gdy go dostaniemy na
+wyłączność, wykonują się operację CRC. Jeśli nie wszystkie dane zostały
+przetworzone, "zwalniamy" blok wczytywania danych i wracamy na początek
+pętli - kopiujemy dane do bufora i ponownie czekamy na dostęp do bloku
+wczytywania danych.
+Gdy przetworzymy wszystkie dane, kopiujemy dane z urządzenia do odpowiednich
+struktur, a następnie "oddajemy" kontekst.
+
+Usuwanie urządzenia:
+Urządzenie czeka, aż wszystkie otwarte pliki zostaną zamknięte, dopiero wówczas
+urządzenie jest odłączane. W momencie wywołania funkcji usuwającej, ustawiana
+jest flaga odrzucająca wszystkie dalsze próby otwarcia nowego pliku. Zwalniane
+są zasoby zajmowane do obsługi urządzenia, przywracane są domyślne wartości
+rejestrów ENABLE, INTR_ENABLE.
+
+Usuwanie sterownika:
+Zanim sterownik zostanie usunięty, czekamy, aż wszystkie urządzenia zakończą
+swoją pracę (jak wyżej).
