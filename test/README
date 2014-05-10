@@ -1,0 +1,4 @@
+Każdy z 5 testów będzie uruchomiony 16 razy. Punktacja za test wynosi
+0.5p jeśli przejdzie co najmniej raz, 1p jeśli przejdzie 16 razy.
+Prawidłowe wyniki to 0x352441c2 w simple, 0xc8402732 dla pozostałych
+testów (powtórzone 8 razy dla mux, rmux, thread).
